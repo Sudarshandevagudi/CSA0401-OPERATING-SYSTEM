@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 200
+
+void findAvgTime(int arr[], int n, int head)
+{
+    int i, total_seek_time = 0;
+    int seek_sequence[MAX];
+    int distance, cur_track;
+
+    // First track request
+    seek_sequence[0] = arr[0];
+    cur_track = arr[0];
+
+    // Calculate total seek time
+    for (i = 1; i < n; i++)
+    {
+        // Calculate absolute distance between current track and next track
+        distance = abs(cur_track - arr[i]);
+        total_seek_time += distance;
+
+        // Update current track
+        cur_track = arr[i];
+        seek_sequence[i] = cur_track;
+    }
+
+    // Print seek sequence
+    printf("Seek Sequence is: \n");
+    for (i = 0; i < n; i++)
+    {
+        printf("%d ", seek_sequence[i]);
+    }
+
+    // Print average seek time
+    printf("\nAverage Seek Time is %d \n", total_seek_time / n);
+}
+
+int main()
+{
+    int n, arr[MAX], head;
+
+    // Number of tracks
+    n = 5;
+    arr[0] = 55;
+    arr[1] = 58;
+    arr[2] = 60;
+    arr[3] = 70;
+    arr[4] = 18;
+
+    // Head position
+    head = 55;
+
+    // Find average seek time
+    findAvgTime(arr, n, head);
+
+    return 0;
+}
