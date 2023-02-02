@@ -1,55 +1,74 @@
-#include <stdio.h>
-#include <stdbool.h>
+//6.Write the C Program for page replacement algorithm using LFU.
 
-#define NUM_PAGE_FRAMES 3
-#define NUM_PAGE_REFERENCES 21
+#include<stdio.h>
+ int main()
+{
+      int total_frames, total_pages, hit = 0;
+      int pages[25], frame[10], arr[25], time[25]; 
+      int m, n, page, flag, k, minimum_time, temp;
+      printf("Enter Total Number of Pages:\t");
+      scanf("%d", &total_pages); 
+      printf("Enter Total Number of Frames:\t");
+      scanf("%d", &total_frames);
+      for(m = 0; m < total_frames; m++)
+      {
+            frame[m] = -1;
+      }
+      for(m = 0; m < 25; m++)
+      {
+            arr[m] = 0;
+      }
+      printf("Enter Values of Reference String\n");
+      for(m = 0; m < total_pages; m++)
+      {
+            printf("Enter Value No.[%d]:\t", m + 1);
+            scanf("%d", &pages[m]);
+      }
+      printf("\n");
+      for(m = 0; m < total_pages; m++)
+      {
+            arr[pages[m]]++;
+            time[pages[m]] = m;
+            flag = 1;
+            k = frame[0];
+            for(n = 0; n < total_frames; n++)
+            {
+                  if(frame[n] == -1 || frame[n] == pages[m])
+                  {
+                        if(frame[n] != -1)
+                        {
+                              hit++;
+                        }
+                        flag = 0;
+                        frame[n] = pages[m];
+                        break;
+                  }
+                  if(arr[k] > arr[frame[n]])
+                  {
+                        k = frame[n];
+                  }
+            }
+            if(flag)
+            {
+                  minimum_time = 25;
+                  for(n = 0; n < total_frames; n++)
+                  {
+                        if(arr[frame[n]] == arr[k] && time[frame[n]] < minimum_time)
+                        {
+                              temp = n;
+                              minimum_time = time[frame[n]];
+                        }
+                  }
+                  arr[frame[temp]] = 0;
+                  frame[temp] = pages[m];
+            }
+            for(n = 0; n < total_frames; n++)
+            {
+                printf("%d\t", frame[n]);
+            }
+            printf("\n");
+      }
+      printf("Page Hit:\t%d\n", hit);
+      return 0;
+}
 
-int page_reference_sequence[NUM_PAGE_REFERENCES] = {1, 2, 3, 2, 1, 5, 2, 1, 6, 2, 5, 6, 3, 1, 3, 6, 1, 2, 4, 3};
-int page_frames[NUM_PAGE_FRAMES];
-int page_fault_count = 0;
-
-bool is_page_fault(int page_number) {
-for (int i = 0; i < NUM_PAGE_FRAMES; i++) {
-if (page_frames[i] == page_number) {
-return false;
-}
-}
-return true;
-}
-
-void replace_page(int page_number) {
-int least_recently_used_index = 0;
-for (int i = 0; i < NUM_PAGE_FRAMES; i++) {
-int j;
-for (j = page_fault_count - 1; j >= 0; j--) {
-if (page_reference_sequence[j] == page_frames[i]) {
-break;
-}
-}
-if (j < least_recently_used_index) {
-least_recently_used_index = i;
-}
-}
-page_frames[least_recently_used_index] = page_number;
-}
-
-int main() {
-for (int i = 0; i < NUM_PAGE_FRAMES; i++) {
-page_frames[i] = -1;
-}
-
-for (int i = 0; i < NUM_PAGE_REFERENCES; i++) {
-int page_number = page_reference_sequence[i];
-if (is_page_fault(page_number)) {
-page_fault_count++;
-if (page_fault_count <= NUM_PAGE_FRAMES) {
-page_frames[page_fault_count - 1] = page_number;
-} else {
-replace_page(page_number);
-}
-}
-}
-
-printf("Number of page faults: %d\n", page_fault_count);
-return 0;
-}
