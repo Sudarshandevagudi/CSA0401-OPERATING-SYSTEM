@@ -1,0 +1,50 @@
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <stdbool.h>
+
+#define BLOCK_SIZE 1 // in KB
+#define NUM_BLOCKS 16
+#define INODE_BLOCKS 8
+#define AVAILABLE_BLOCKS (NUM_BLOCKS - INODE_BLOCKS)
+
+int disk[NUM_BLOCKS];
+
+void init_disk() {
+    for (int i = 0; i < NUM_BLOCKS; i++)
+        disk[i] = 0;
+}
+
+bool check_contiguous_blocks(int start, int size) {
+    int end = start + size - 1;
+    if (end >= NUM_BLOCKS) return false;
+    for (int i = start; i <= end; i++)
+        if (disk[i] != 0) return false;
+    return true;
+}
+
+void allocate_blocks(int start, int size) {
+    int end = start + size - 1;
+    for (int i = start; i <= end; i++)
+        disk[i] = 1;
+}
+
+int main() {
+    int file_size, num_blocks_needed, start_block = INODE_BLOCKS;
+    init_disk();
+    printf("Enter file size in KB: ");
+    scanf("%d", &file_size);
+    num_blocks_needed = (file_size + BLOCK_SIZE - 1) / BLOCK_SIZE;
+    while (start_block < NUM_BLOCKS) {
+        if (check_contiguous_blocks(start_block, num_blocks_needed)) {
+            allocate_blocks(start_block, num_blocks_needed);
+            printf("Allocated blocks: %d to %d\n", start_block, start_block + num_blocks_needed - 1);
+            break;
+        }
+        start_block++;
+    }
+    if (start_block >= NUM_BLOCKS) {
+        printf("Not enough contiguous blocks available. Exiting...\n");
+        exit(0);
+    }
+    return 0;
+}
